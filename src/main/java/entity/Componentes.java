@@ -19,6 +19,10 @@ public class Componentes {
         this.id_fabricante = id_fabricante;
     }
 
+    public Componentes() {
+
+    }
+
     public int getId_componente() {
         return id_componente;
     }

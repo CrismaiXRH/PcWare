@@ -14,6 +14,9 @@ public class Fabricantes {
         this.pais = pais;
         this.telefono = telefono;
     }
+    public Fabricantes() {
+
+    }
 
     public int getId_fabricante() {
         return id_fabricante;

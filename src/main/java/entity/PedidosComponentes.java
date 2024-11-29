@@ -13,6 +13,10 @@ public class PedidosComponentes {
         this.cantidad = cantidad;
     }
 
+    public PedidosComponentes() {
+
+    }
+
     public int getId_pedido() {
         return id_pedido;
     }

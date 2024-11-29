@@ -1,5 +1,6 @@
 package entity;
 
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Objects;
 
@@ -14,6 +15,7 @@ public class Pedidos {
         this.fecha = fecha;
         this.id_cliente = id_cliente;
     }
+    public Pedidos() {}
 
     public Calendar getFecha() {
         return fecha;
