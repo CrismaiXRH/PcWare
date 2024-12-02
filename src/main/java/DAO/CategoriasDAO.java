@@ -31,73 +31,85 @@ public class CategoriasDAO extends Categorias {
     }
 
     public void save() {
-        if (id_categoria == -1) {
-            // INSERT
-            Connection conn = null;
-            PreparedStatement ps = null;
-            ResultSet rs = null;
-            try {
-                conn = getWorkbenchConnection();
-                if (conn != null) {
-                    System.out.println("Conexión establecida correctamente.");
-                    ps = conn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS);
-                    ps.setString(1, this.nombre);
-                    int rowsAffected = ps.executeUpdate();
-                    System.out.println("Filas afectadas por el INSERT: " + rowsAffected); // Verifica si el INSERT se ejecuta correctamente.
-                    rs = ps.getGeneratedKeys();
-                    if (rs.next()) {
-                        this.id_categoria = rs.getInt(1); // Obtiene el ID generado
-                        System.out.println("ID generado: " + this.id_categoria);
-                    }
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (rs != null) {
-                        rs.close();
-                    }
-                    if (ps != null) {
-                        ps.close();
-                    }
-                    if (conn != null) {
-                        conn.close();
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = getWorkbenchConnection();
+            if (conn != null) {
+                ps = conn.prepareStatement(INSERT); // No se usa RETURN_GENERATED_KEYS
+                ps.setString(1, this.getNombre());
+                int rowsAffected = ps.executeUpdate();
+                System.out.println("Filas afectadas por el INSERT: " + rowsAffected);
             }
-        } else {
-            // UPDATE
-            Connection conn = null;
-            PreparedStatement ps = null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
             try {
-                conn = getWorkbenchConnection();
+                if (ps != null) {
+                    ps.close();
+                }
                 if (conn != null) {
-                    System.out.println("Conexión establecida correctamente.");
-                    ps = conn.prepareStatement(UPDATE);
-                    ps.setString(1, this.nombre);
-                    ps.setInt(2, this.id_categoria);
-                    int rowsAffected = ps.executeUpdate();
-                    System.out.println("Filas afectadas por el UPDATE: " + rowsAffected); // Verifica si el UPDATE se ejecuta correctamente.
+                    conn.close();
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
-            } finally {
-                try {
-                    if (ps != null) {
-                        ps.close();
-                    }
-                    if (conn != null) {
-                        conn.close();
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
             }
         }
     }
 
+
+    public void update() {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = getWorkbenchConnection();
+            if (conn != null) {
+                // Construcción dinámica del SQL
+                StringBuilder sql = new StringBuilder("UPDATE categorias SET ");
+                boolean hasFields = false;
+
+                if (this.getNombre() != null && !this.getNombre().isEmpty()) {
+                    sql.append("nombre = ?, ");
+                    hasFields = true;
+                }
+
+                // Verificar si hay campos para actualizar
+                if (!hasFields) {
+                    System.out.println("No hay campos para actualizar.");
+                    return;
+                }
+
+                // Quitar la última coma y agregar la cláusula WHERE
+                sql.setLength(sql.length() - 2);
+                sql.append(" WHERE id_categoria = ?");
+
+                ps = conn.prepareStatement(sql.toString());
+
+                // Asignar valores a los campos
+                int index = 1;
+                if (this.getNombre() != null && !this.getNombre().isEmpty()) {
+                    ps.setString(index++, this.getNombre());
+                }
+                ps.setInt(index, this.getId_categoria()); // Asignar el ID
+
+                // Ejecutar la consulta
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public void remove() {
         if (id_categoria != -1) {

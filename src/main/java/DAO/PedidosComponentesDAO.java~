@@ -10,7 +10,7 @@ public class PedidosComponentesDAO extends PedidosComponentes {
 
     private final static String INSERT = "INSERT INTO pedido_componentes (id_pedido, id_componente, cantidad) VALUES (?, ?, ?)";
     private final static String UPDATE = "UPDATE pedido_componentes SET id_pedido=?, id_componente=?, cantidad=? WHERE id_pedido_componentes=?";
-    private final static String DELETE = "DELETE FROM pedido_componentes WHERE id_pedido =? AND id_componente=?";
+    private final static String DELETE = "DELETE FROM pedido_componentes WHERE id_pedido_componentes=? AND ";
     private final static String SELECTALL = "SELECT * FROM pedido_componentes";
     private final static String SELECTBYID = "SELECT * FROM pedido_componentes WHERE id_pedido_componentes=?";
     private final static String SELECTBYCOMPONENTE = "SELECT * FROM pedido_componentes WHERE id_componente=?";

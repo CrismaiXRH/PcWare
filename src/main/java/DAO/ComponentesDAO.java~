@@ -38,14 +38,9 @@ public class ComponentesDAO extends Componentes {
         try {
             conn = getWorkbenchConnection();
             if (conn != null) {
-                // Preparamos el INSERT para la tabla 'componentes'
-                ps = conn.prepareStatement(INSERT);  // Asegúrate de tener la sentencia SQL correcta aquí
-                ps.setString(1, this.getNombre());   // El nombre del componente
-                ps.setString(2, this.getDescripcion()); // La descripción del componente
-                ps.setInt(3, this.getPrecio());      // El precio del componente
-                ps.setInt(4, this.getId_categoria()); // La categoría del componente
-                ps.setInt(5, this.getId_fabricante()); // El fabricante del componente
-                int rowsAffected = ps.executeUpdate(); // Ejecuta la sentencia SQL
+                ps = conn.prepareStatement(INSERT); // No se usa RETURN_GENERATED_KEYS
+                ps.setString(1, this.getNombre());
+                int rowsAffected = ps.executeUpdate();
                 System.out.println("Filas afectadas por el INSERT: " + rowsAffected);
             }
         } catch (SQLException e) {
@@ -63,7 +58,6 @@ public class ComponentesDAO extends Componentes {
             }
         }
     }
-
 
 
     public void update() {

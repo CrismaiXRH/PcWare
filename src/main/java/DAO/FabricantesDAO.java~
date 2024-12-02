@@ -66,49 +66,11 @@ public class FabricantesDAO extends Fabricantes {
         try {
             conn = getWorkbenchConnection();
             if (conn != null) {
-                // Construcción dinámica del SQL
-                StringBuilder sql = new StringBuilder("UPDATE fabricantes SET ");
-                boolean hasFields = false;
-
-                if (this.getNombre() != null && !this.getNombre().isEmpty()) {
-                    sql.append("nombre = ?, ");
-                    hasFields = true;
-                }
-                if (this.getPais() != null && !this.getPais().isEmpty()) {
-                    sql.append("pais = ?, ");
-                    hasFields = true;
-                }
-                if (this.getTelefono() != null && !this.getTelefono().isEmpty()) {
-                    sql.append("telefono = ?, ");
-                    hasFields = true;
-                }
-
-                // Verificar si hay campos para actualizar
-                if (!hasFields) {
-                    System.out.println("No hay campos para actualizar.");
-                    return;
-                }
-
-                // Quitar la última coma y agregar la cláusula WHERE
-                sql.setLength(sql.length() - 2);
-                sql.append(" WHERE id_fabricante = ?");
-
-                ps = conn.prepareStatement(sql.toString());
-
-                // Asignar valores a los campos
-                int index = 1;
-                if (this.getNombre() != null && !this.getNombre().isEmpty()) {
-                    ps.setString(index++, this.getNombre());
-                }
-                if (this.getPais() != null && !this.getPais().isEmpty()) {
-                    ps.setString(index++, this.getPais());
-                }
-                if (this.getTelefono() != null && !this.getTelefono().isEmpty()) {
-                    ps.setString(index++, this.getTelefono());
-                }
-                ps.setInt(index, this.getId_fabricante()); // Asignar el ID
-
-                // Ejecutar la consulta
+                ps = conn.prepareStatement(UPDATE);
+                ps.setString(1, this.getNombre());
+                ps.setString(2, this.getPais());
+                ps.setString(3, this.getTelefono());
+                ps.setInt(4, this.getId_fabricante());
                 ps.executeUpdate();
             }
         } catch (SQLException e) {
@@ -126,7 +88,6 @@ public class FabricantesDAO extends Fabricantes {
             }
         }
     }
-
 
     public void delete() {
         Connection conn = null;

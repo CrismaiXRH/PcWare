@@ -32,72 +32,96 @@ public class ClientesDAO extends Clientes {
     }
 
     public void save() {
-        if (id_cliente == -1) {
-            Connection conn = null;
-            PreparedStatement ps = null;
-            ResultSet rs = null;
-            try {
-                conn = getWorkbenchConnection();
-                if (conn != null) {
-                    System.out.println("Conexion establecida correctamente.");
-                    ps = conn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS);
-                    ps.setString(1, this.nombre);
-                    ps.setString(2, this.correo);
-                    ps.setString(3, this.telefono);
-                    int rowsAffected = ps.executeUpdate();
-                    System.out.println("Filas afectadas por el INSERT: " + rowsAffected); // Verifica si el INSERT se ejecuta correctamente.
-                    rs = ps.getGeneratedKeys();
-                    if (rs.next()) {
-                        this.id_cliente = rs.getInt(1); // Obtiene el ID generado
-                        System.out.println("ID generado: " + this.id_cliente);
-                    }
-
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (rs != null) {
-                        rs.close();
-                    }
-                    if (ps != null) {
-                        ps.close();
-                    }
-                    if (conn != null) {
-                        conn.close();
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = getWorkbenchConnection();
+            if (conn != null) {
+                ps = conn.prepareStatement(INSERT);
+                ps.setString(1, this.getNombre());
+                ps.setString(2, this.getCorreo());
+                ps.setString(3, this.getTelefono());
+                ps.executeUpdate();
             }
-        } else {
-            Connection conn = null;
-            PreparedStatement ps = null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
             try {
-                conn = getWorkbenchConnection();
+                if (ps != null) {
+                    ps.close();
+                }
                 if (conn != null) {
-                    System.out.println("Conexion establecida correctamente.");
-                    ps = conn.prepareStatement(UPDATE);
-                    ps.setString(1, this.nombre);
-                    ps.setString(2, this.correo);
-                    ps.setString(3, this.telefono);
-                    ps.setInt(4, this.id_cliente);
-                    int rowsAffected = ps.executeUpdate();
-                    System.out.println("Filas afectadas por el UPDATE: " + rowsAffected); // Verifica si el UPDATE se ejecuta correctamente.
+                    conn.close();
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
-            } finally {
-                try {
-                    if (ps != null) {
-                        ps.close();
-                    }
-                    if (conn != null) {
-                        conn.close();
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
+            }
+    }
+    }
+
+    public void update() {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = getWorkbenchConnection();
+            if (conn != null) {
+                // Construcción dinámica del SQL
+                StringBuilder sql = new StringBuilder("UPDATE clientes SET ");
+                boolean hasFields = false;
+
+                if (this.getNombre() != null && !this.getNombre().isEmpty()) {
+                    sql.append("nombre = ?, ");
+                    hasFields = true;
                 }
+                if (this.getCorreo() != null && !this.getCorreo().isEmpty()) {
+                    sql.append("correo = ?, ");
+                    hasFields = true;
+                }
+                if (this.getTelefono() != null && !this.getTelefono().isEmpty()) {
+                    sql.append("telefono = ?, ");
+                    hasFields = true;
+                }
+
+                // Verificar si hay campos para actualizar
+                if (!hasFields) {
+                    System.out.println("No hay campos para actualizar.");
+                    return;
+                }
+
+                // Quitar la última coma y agregar la cláusula WHERE
+                sql.setLength(sql.length() - 2);
+                sql.append(" WHERE id_cliente = ?");
+
+                ps = conn.prepareStatement(sql.toString());
+
+                // Asignar valores a los campos
+                int index = 1;
+                if (this.getNombre() != null && !this.getNombre().isEmpty()) {
+                    ps.setString(index++, this.getNombre());
+                }
+                if (this.getCorreo() != null && !this.getCorreo().isEmpty()) {
+                    ps.setString(index++, this.getCorreo());
+                }
+                if (this.getTelefono() != null && !this.getTelefono().isEmpty()) {
+                    ps.setString(index++, this.getTelefono());
+                }
+                ps.setInt(index, this.getId_cliente()); // Asignar el ID
+
+                // Ejecutar la consulta
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
     }
