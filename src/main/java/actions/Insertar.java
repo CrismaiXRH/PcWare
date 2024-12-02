@@ -24,7 +24,6 @@ public class Insertar {
         switch (this.opcion) {
             case 1:
                 sc.nextLine();
-                //Lamar a la funcoin save de FabricanteDAO
                 System.out.println("Insertar Fabricante");
                 System.out.println("Nombre: ");
                 String nombreFabricante = sc.nextLine();

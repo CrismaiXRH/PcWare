@@ -27,7 +27,7 @@ public class Actualizar {
                     System.out.println("Actualizar Fabricante");
                     System.out.println("Id: ");
                     int id_fabricante = sc.nextInt();
-                    sc.nextLine(); // Consumir el salto de línea
+                    sc.nextLine();
 
                     System.out.println("Dejar vacío para no actualizar el campo");
                     System.out.println("Nombre: ");
@@ -42,7 +42,6 @@ public class Actualizar {
                     FabricantesDAO fabricantesDAO = new FabricantesDAO();
                     fabricantesDAO.setId_fabricante(id_fabricante);
 
-                    // Solo asignar los valores si no están vacíos
                     if (!nombreFabricante.isEmpty()) {
                         fabricantesDAO.setNombre(nombreFabricante);
                     }
@@ -59,7 +58,7 @@ public class Actualizar {
                     System.out.println("Actualizar Componente");
                     System.out.println("Id del componente: ");
                     int id_componente = sc.nextInt();
-                    sc.nextLine(); // Consumir el salto de línea
+                    sc.nextLine();
 
                     System.out.println("Dejar vacío para no actualizar el campo (o ingrese 0 para valores numéricos)");
                     System.out.println("Nombre: ");
@@ -83,7 +82,6 @@ public class Actualizar {
                     ComponentesDAO componentesDAO = new ComponentesDAO();
                     componentesDAO.setId_componente(id_componente);
 
-                    // Solo asignar los valores si no están vacíos
                     if (!nombreComponente.isEmpty()) {
                         componentesDAO.setNombre(nombreComponente);
                     }
@@ -104,11 +102,10 @@ public class Actualizar {
 
                     break;
                 case 3:
-                    //Lamar a la funcoin update de CategoriasDAO
                     System.out.println("Actualizar Categoría");
                     System.out.println("Id de la categoría: ");
                     int id_categoria = sc.nextInt();
-                    sc.nextLine(); // Consumir el salto de línea
+                    sc.nextLine();
 
                     System.out.println("Dejar vacío para no actualizar el campo");
                     System.out.println("Nombre: ");
@@ -117,7 +114,6 @@ public class Actualizar {
                     CategoriasDAO categoriasDAO = new CategoriasDAO();
                     categoriasDAO.setId_categoria(id_categoria);
 
-                    // Solo asignar el valor si no está vacío
                     if (!nombreCategoria.isEmpty()) {
                         categoriasDAO.setNombre(nombreCategoria);
                     }
@@ -126,11 +122,10 @@ public class Actualizar {
 
                     break;
                 case 4:
-                    //Lamar a la funcoin update de PedidosDAO
                     System.out.println("Actualizar Pedido");
                     System.out.println("Id del pedido: ");
                     int id_pedido = sc.nextInt();
-                    sc.nextLine(); // Consumir el salto de línea
+                    sc.nextLine();
 
                     System.out.println("Dejar vacío para no actualizar el campo");
                     System.out.println("Fecha (YYYY-MM-DD): ");
@@ -142,7 +137,6 @@ public class Actualizar {
                     PedidosDAO pedidosDAO = new PedidosDAO();
                     pedidosDAO.setId_pedido(id_pedido);
 
-                    // Solo asignar valores si son válidos
                     if (!fecha.isEmpty()) {
                         pedidosDAO.setFecha(fecha);
                     }
@@ -154,13 +148,12 @@ public class Actualizar {
 
                     break;
                 case 5:
-                    //Lamar a la funcoin update de PedidosComponentesDAO
                     System.out.println("Actualizar Pedido-Componente");
                     System.out.println("Id del pedido: ");
                     int id_pedidoTablaCompuesta = sc.nextInt();
                     System.out.println("Id del componente: ");
                     int id_componenteTablaCompuesta = sc.nextInt();
-                    sc.nextLine(); // Consumir el salto de línea
+                    sc.nextLine();
 
                     System.out.println("Dejar vacío para no actualizar el campo");
                     System.out.println("Cantidad: ");
@@ -170,7 +163,6 @@ public class Actualizar {
                     pedidosComponentesDAO.setId_pedido(id_pedidoTablaCompuesta);
                     pedidosComponentesDAO.setId_componente(id_componenteTablaCompuesta);
 
-                    // Solo asignar valores si son válidos
                     if (!cantidadInput.isEmpty()) {
                         pedidosComponentesDAO.setCantidad(Integer.parseInt(cantidadInput));
                     }
@@ -179,11 +171,10 @@ public class Actualizar {
 
                     break;
                 case 6:
-                    //Lamar a la funcoin update de ClientesDAO
                     System.out.println("Actualizar Cliente");
                     System.out.println("Id del cliente: ");
                     int id_cliente = sc.nextInt();
-                    sc.nextLine(); // Consumir el salto de línea
+                    sc.nextLine();
 
                     System.out.println("Dejar vacío para no actualizar el campo");
                     System.out.println("Nombre: ");
@@ -198,7 +189,6 @@ public class Actualizar {
                     ClientesDAO clientesDAO = new ClientesDAO();
                     clientesDAO.setId_cliente(id_cliente);
 
-                    // Solo asignar los valores si no están vacíos
                     if (!nombreCliente.isEmpty()) {
                         clientesDAO.setNombre(nombreCliente);
                     }

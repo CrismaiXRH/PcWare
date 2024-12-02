@@ -2,7 +2,9 @@ package DAO;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import entity.Categorias;
 
@@ -13,6 +15,11 @@ public class CategoriasDAO extends Categorias {
     private final static String DELETE = "DELETE FROM Categorias WHERE id_categoria=?";
     private final static String SELECTBYID = "SELECT id_categoria, nombre FROM Categorias WHERE id_categoria=?";
     private final static String SELECTALL = "SELECT id_categoria, nombre FROM Categorias";
+    private static final String SELECTPRODUCTOSCAROS =
+            "SELECT c.id_categoria, ca.nombre AS categoria, c.nombre AS producto_mas_caro, MAX(c.precio) AS precio " +
+                    "FROM Componentes c " +
+                    "JOIN Categorias ca ON c.id_categoria = ca.id_categoria " +
+                    "GROUP BY c.id_categoria";
 
     public CategoriasDAO(int id_categoria, String nombre) {
         super(id_categoria, nombre);
@@ -64,36 +71,28 @@ public class CategoriasDAO extends Categorias {
         try {
             conn = getWorkbenchConnection();
             if (conn != null) {
-                // Construcción dinámica del SQL
-                StringBuilder sql = new StringBuilder("UPDATE categorias SET ");
+                StringBuilder sql = new StringBuilder(UPDATE);
                 boolean hasFields = false;
 
                 if (this.getNombre() != null && !this.getNombre().isEmpty()) {
-                    sql.append("nombre = ?, ");
                     hasFields = true;
                 }
 
-                // Verificar si hay campos para actualizar
                 if (!hasFields) {
                     System.out.println("No hay campos para actualizar.");
                     return;
                 }
 
-                // Quitar la última coma y agregar la cláusula WHERE
-                sql.setLength(sql.length() - 2);
-                sql.append(" WHERE id_categoria = ?");
-
                 ps = conn.prepareStatement(sql.toString());
 
-                // Asignar valores a los campos
                 int index = 1;
                 if (this.getNombre() != null && !this.getNombre().isEmpty()) {
                     ps.setString(index++, this.getNombre());
                 }
-                ps.setInt(index, this.getId_categoria()); // Asignar el ID
+                ps.setInt(index, this.getId_categoria());
 
-                // Ejecutar la consulta
                 ps.executeUpdate();
+                System.out.println("Categoría actualizada correctamente.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -113,7 +112,6 @@ public class CategoriasDAO extends Categorias {
 
     public void remove() {
         if (id_categoria != -1) {
-            // DELETE
             Connection conn = null;
             PreparedStatement ps = null;
             try {
@@ -122,7 +120,7 @@ public class CategoriasDAO extends Categorias {
                     ps = conn.prepareStatement(DELETE);
                     ps.setInt(1, this.id_categoria);
                     if (ps.executeUpdate() == 1) {
-                        this.id_categoria = -1; // Si se borra correctamente, marcamos como no existente
+                        this.id_categoria = -1;
                     }
                 }
             } catch (SQLException e) {
@@ -140,41 +138,42 @@ public class CategoriasDAO extends Categorias {
                 }
             }
         }
+
     }
 
-    public void getById(int id_categoria) {
+    public Categorias getById(int id_categoria) {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
+        Categorias categoria = null;
+
         try {
-            conn = getWorkbenchConnection();
+            conn = getWorkbenchConnection(); // Método para obtener la conexión a la base de datos
             if (conn != null) {
                 ps = conn.prepareStatement(SELECTBYID);
                 ps.setInt(1, id_categoria);
                 rs = ps.executeQuery();
+
                 if (rs.next()) {
-                    this.id_categoria = rs.getInt("id_categoria"); // Cambié "id" por "id_categoria"
-                    this.nombre = rs.getString("nombre");
+                    categoria = new Categorias();
+                    categoria.setId_categoria(rs.getInt("id_categoria"));
+                    categoria.setNombre(rs.getString("nombre"));
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (ps != null) {
-                    ps.close();
-                }
-                if (conn != null) {
-                    conn.close();
-                }
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
+        return categoria;
     }
+
 
     public static List<Categorias> getAll() {
         List<Categorias> result = new ArrayList<Categorias>();
@@ -183,7 +182,7 @@ public class CategoriasDAO extends Categorias {
             PreparedStatement ps = null;
             ResultSet rs = null;
             try {
-                ps = conn.prepareStatement(SELECTALL);
+                ps = conn.prepareStatement( SELECTALL);
                 rs = ps.executeQuery();
                 while (rs.next()) {
                     Categorias c = new Categorias(rs.getInt("id_categoria"), rs.getString("nombre"));
@@ -208,6 +207,24 @@ public class CategoriasDAO extends Categorias {
             }
         }
         return result;
+    }
+
+    public List<Map<String, Object>> getProductosCarosPorCategoria() {
+        List<Map<String, Object>> productos = new ArrayList<>();
+        try (Connection conn = getWorkbenchConnection();
+             PreparedStatement ps = conn.prepareStatement(SELECTPRODUCTOSCAROS);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Map<String, Object> producto = new HashMap<>();
+                producto.put("categoria", rs.getString("categoria"));
+                producto.put("producto_mas_caro", rs.getString("producto_mas_caro"));
+                producto.put("precio", rs.getBigDecimal("precio"));
+                productos.add(producto);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return productos;
     }
 
     private static Connection getWorkbenchConnection() {

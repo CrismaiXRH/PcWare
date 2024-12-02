@@ -1,7 +1,5 @@
-import actions.Actualizar;
-import actions.Eliminar;
-import actions.Insertar;
-import actions.Listar;
+import actions.*;
+import model.MySqlConnection;
 
 import java.sql.Connection;
 import java.util.Scanner;
@@ -11,7 +9,7 @@ public class Main {
         int opcion = 0;
         Scanner sc = new Scanner(System.in);
         try {
-            Connection conn = model.MySqlConnection.getConnection();
+            Connection conn = MySqlConnection.getConnection();
             if (conn != null) {
                 System.out.println("Conexion exitosa");
                 while (true) {
@@ -21,7 +19,8 @@ public class Main {
                     System.out.println("Actualizar datos [2]");
                     System.out.println("Eliminar datos [3]");
                     System.out.println("Consultas [4]");
-                    System.out.println("Salir [5]");
+                    System.out.println("Consultas Avanzadas [5]");
+                    System.out.println("Salir [6]");
                     System.out.println("-----------------");
                     opcion = sc.nextInt();
 
@@ -43,8 +42,13 @@ public class Main {
                             Listar listar = new Listar();
                             listar.Listar();
                             break;
-                        case 5:
-                            System.out.println("Salir [5]");
+
+                            case 5:
+                                ListarComplejas listarComplejas = new ListarComplejas();
+                                listarComplejas.ListarComplejas();
+                                break;
+                        case 6:
+                            System.exit(0);
                             break;
                         default:
                             System.out.println("Opcion no valida.");
@@ -54,7 +58,7 @@ public class Main {
             } else {
                 System.out.println("No se pudo conectar a la base de datos.");
             }
-            model.MySqlConnection.closeConnection();
+            MySqlConnection.closeConnection();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -2,7 +2,9 @@ package DAO;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import entity.Fabricantes;
 
@@ -13,8 +15,13 @@ public class FabricantesDAO extends Fabricantes {
     private final static String DELETE = "DELETE FROM fabricantes WHERE id_fabricante=?";
     private final static String SELECTALL = "SELECT * FROM fabricantes";
     private final static String SELECTBYID = "SELECT * FROM fabricantes WHERE id_fabricante=?";
-    private final static String SELECTBYNAME = "SELECT * FROM fabricantes WHERE nombre=?";
-    private final static String SELECTBYPAIS = "SELECT * FROM fabricantes WHERE pais=?";
+    private final static String SELECTBYNAME = "SELECT * FROM Fabricantes WHERE LOWER(nombre) LIKE LOWER(?)";
+    private final static String SELECTBYPAIS = "SELECT * FROM fabricantes WHERE LOWER(pais) LIKE LOWER(?)";
+    private static final String SELECTFABRICANTESCANTIDAD =
+            "SELECT f.nombre AS fabricante, COUNT(c.id_componente) AS cantidad_componentes " +
+                    "FROM Fabricantes f " +
+                    "JOIN Componentes c ON f.id_fabricante = c.id_fabricante " +
+                    "GROUP BY f.id_fabricante";
 
     public FabricantesDAO(int id_fabricante, String nombre, String pais, String telefono) {
         super(id_fabricante, nombre, pais, telefono);
@@ -66,49 +73,30 @@ public class FabricantesDAO extends Fabricantes {
         try {
             conn = getWorkbenchConnection();
             if (conn != null) {
-                // Construcción dinámica del SQL
-                StringBuilder sql = new StringBuilder("UPDATE fabricantes SET ");
-                boolean hasFields = false;
+                ps = conn.prepareStatement(UPDATE);
 
-                if (this.getNombre() != null && !this.getNombre().isEmpty()) {
-                    sql.append("nombre = ?, ");
-                    hasFields = true;
-                }
-                if (this.getPais() != null && !this.getPais().isEmpty()) {
-                    sql.append("pais = ?, ");
-                    hasFields = true;
-                }
-                if (this.getTelefono() != null && !this.getTelefono().isEmpty()) {
-                    sql.append("telefono = ?, ");
-                    hasFields = true;
-                }
-
-                // Verificar si hay campos para actualizar
-                if (!hasFields) {
-                    System.out.println("No hay campos para actualizar.");
-                    return;
-                }
-
-                // Quitar la última coma y agregar la cláusula WHERE
-                sql.setLength(sql.length() - 2);
-                sql.append(" WHERE id_fabricante = ?");
-
-                ps = conn.prepareStatement(sql.toString());
-
-                // Asignar valores a los campos
                 int index = 1;
-                if (this.getNombre() != null && !this.getNombre().isEmpty()) {
-                    ps.setString(index++, this.getNombre());
-                }
-                if (this.getPais() != null && !this.getPais().isEmpty()) {
-                    ps.setString(index++, this.getPais());
-                }
-                if (this.getTelefono() != null && !this.getTelefono().isEmpty()) {
-                    ps.setString(index++, this.getTelefono());
-                }
-                ps.setInt(index, this.getId_fabricante()); // Asignar el ID
 
-                // Ejecutar la consulta
+                if (this.nombre != null && !this.nombre.isEmpty()) {
+                    ps.setString(index++, this.nombre);
+                } else {
+                    ps.setString(index++, null);
+                }
+
+                if (this.pais != null && !this.pais.isEmpty()) {
+                    ps.setString(index++, this.pais);
+                } else {
+                    ps.setString(index++, null);
+                }
+
+                if (this.telefono != null && !this.telefono.isEmpty()) {
+                    ps.setString(index++, this.telefono);
+                } else {
+                    ps.setString(index++, null);
+                }
+
+                ps.setInt(index, this.id_fabricante);
+
                 ps.executeUpdate();
             }
         } catch (SQLException e) {
@@ -126,6 +114,8 @@ public class FabricantesDAO extends Fabricantes {
             }
         }
     }
+
+
 
 
     public void delete() {
@@ -223,8 +213,8 @@ public class FabricantesDAO extends Fabricantes {
         return fabricantes;
     }
 
-    public Fabricantes getByName(String nombre) {
-        Fabricantes fabricantes = null;
+    public List<Fabricantes> getByName(String nombre) {
+        List<Fabricantes> fabricantes = new ArrayList<>();
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -232,25 +222,24 @@ public class FabricantesDAO extends Fabricantes {
             conn = getWorkbenchConnection();
             if (conn != null) {
                 ps = conn.prepareStatement(SELECTBYNAME);
-                ps.setString(1, nombre);
+                ps.setString(1, "%" + nombre + "%");
                 rs = ps.executeQuery();
-                if (rs.next()) {
-                    fabricantes = new Fabricantes(rs.getInt("id_fabricante"), rs.getString("nombre"), rs.getString("pais"), rs.getString("telefono"));
+                while (rs.next()) {
+                    fabricantes.add(new Fabricantes(
+                            rs.getInt("id_fabricante"),
+                            rs.getString("nombre"),
+                            rs.getString("pais"),
+                            rs.getString("telefono")
+                    ));
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (ps != null) {
-                    ps.close();
-                }
-                if (conn != null) {
-                    conn.close();
-                }
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -258,8 +247,9 @@ public class FabricantesDAO extends Fabricantes {
         return fabricantes;
     }
 
-    public Fabricantes getByPais(String pais) {
-        Fabricantes fabricantes = null;
+
+    public List<Fabricantes> getByPais(String pais) {
+        List<Fabricantes> fabricantes = new ArrayList<>();
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -267,28 +257,44 @@ public class FabricantesDAO extends Fabricantes {
             conn = getWorkbenchConnection();
             if (conn != null) {
                 ps = conn.prepareStatement(SELECTBYPAIS);
-                ps.setString(1, pais);
+                ps.setString(1, "%" + pais + "%");
                 rs = ps.executeQuery();
-                if (rs.next()) {
-                    fabricantes = new Fabricantes(rs.getInt("id_fabricante"), rs.getString("nombre"), rs.getString("pais"), rs.getString("telefono"));
+                while (rs.next()) {
+                    fabricantes.add(new Fabricantes(
+                            rs.getInt("id_fabricante"),
+                            rs.getString("nombre"),
+                            rs.getString("pais"),
+                            rs.getString("telefono")
+                    ));
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (ps != null) {
-                    ps.close();
-                }
-                if (conn != null) {
-                    conn.close();
-                }
+                if (rs != null) rs.close();
+                if (ps != null) ps.close();
+                if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        }
+        return fabricantes;
+    }
+
+    public List<Map<String, Object>> getFabricantesConCantidadComponentes() {
+        List<Map<String, Object>> fabricantes = new ArrayList<>();
+        try (Connection conn = getWorkbenchConnection();
+             PreparedStatement ps = conn.prepareStatement(SELECTFABRICANTESCANTIDAD);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Map<String, Object> fabricante = new HashMap<>();
+                fabricante.put("fabricante", rs.getString("fabricante"));
+                fabricante.put("cantidad_componentes", rs.getInt("cantidad_componentes"));
+                fabricantes.add(fabricante);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return fabricantes;
     }
