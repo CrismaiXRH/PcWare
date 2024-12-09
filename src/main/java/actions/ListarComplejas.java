@@ -130,9 +130,7 @@ public class ListarComplejas {
                         }
                     }
                     break;
-
                 case 7:
-
                     System.out.println("Saliendo...");
                     return;
 
@@ -141,8 +139,6 @@ public class ListarComplejas {
             }
         }
     }
-
     public void ListarComplejas() {
-
     }
 }

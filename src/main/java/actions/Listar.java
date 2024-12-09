@@ -245,14 +245,14 @@ public class Listar {
                             }
                             break;
                         case 2:
-                            System.out.println("Introduzca el ID del pedido: ");
-                            int idPedido = sc.nextInt();
-                            Pedidos pedidos = pedidosDAO.getById(idPedido);
-                            if (pedidos == null) {
+                            System.out.println("Introduzca el ID de la categoria ");
+                            int idCategoria = sc.nextInt();
+                            Categorias categorias1 = categoriasDAO.getById(idCategoria);
+                            if (categorias1 == null) {
                                 System.out.println("No se encontraron componentes con ese ID.");
                             } else {
-                                System.out.println("ID: " + pedidos.getId_pedido());
-                                System.out.println("Fecha: " + pedidos.getFecha());
+                                System.out.println("ID: " + categorias1.getId_categoria());
+                                System.out.println("Nombre: " + categorias1.getNombre());
                                 System.out.println("----------------------------");
                             }
                             break;
@@ -449,9 +449,6 @@ public class Listar {
         }
 
     }
-
     public void Listar() {
-
     }
-
 }

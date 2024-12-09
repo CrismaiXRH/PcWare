@@ -226,7 +226,6 @@ public class CategoriasDAO extends Categorias {
         }
         return productos;
     }
-
     private static Connection getWorkbenchConnection() {
         Connection conn = null;
         try {

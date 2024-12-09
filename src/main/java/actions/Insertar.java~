@@ -117,6 +117,8 @@ public class Insertar {
             }
         }
     }
+
+
     public int getOpcion() {
         return this.opcion;
     }
