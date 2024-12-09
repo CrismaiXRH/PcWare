@@ -1,5 +1,5 @@
-import actions.*;
 import model.MySqlConnection;
+import view.*;
 
 import java.sql.Connection;
 import java.util.Scanner;

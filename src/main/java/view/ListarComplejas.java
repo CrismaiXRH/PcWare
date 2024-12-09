@@ -1,4 +1,4 @@
-package actions;
+package view;
 
 import DAO.ClientesDAO;
 import DAO.FabricantesDAO;
